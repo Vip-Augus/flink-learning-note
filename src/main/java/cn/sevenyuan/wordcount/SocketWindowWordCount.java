@@ -1,4 +1,4 @@
-package cn.sevenyuan;
+package cn.sevenyuan.wordcount;
 
 import cn.sevenyuan.domain.WordWithCount;
 import org.apache.flink.api.common.functions.FlatMapFunction;
@@ -10,6 +10,9 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
 /**
+ * socket 数据源
+ * 统计输入文字的次数，输入通过空格分割
+ * 有时间限制，统计时间窗口为 5s 之内的字符
  * @author JingQ at 2019-09-18
  */
 public class SocketWindowWordCount {

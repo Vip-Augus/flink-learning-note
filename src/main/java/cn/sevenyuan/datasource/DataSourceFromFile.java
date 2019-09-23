@@ -26,7 +26,7 @@ public class DataSourceFromFile {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        String filePath = "~/Deploy/Project/IdeaProject/flink-quick-start/src/main/resources/datasource/student.txt";
+        String filePath = "/Users/jingqi/Deploy/Project/IdeaProject/flink-quick-start/src/main/resources/datasource/student.txt";
 
         // 简单的文字文件输入流
 //        DataStreamSource<String> textFileSource =

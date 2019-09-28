@@ -20,6 +20,8 @@ public class Student {
 
     private Date checkInTime;
 
+    private long successTimeStamp;
+
     public Student() {
     }
 
@@ -28,5 +30,11 @@ public class Student {
         this.name = name;
         this.age = age;
         this.address = address;
+    }
+
+    public static Student of(int id, String name, int age, String address, long timeStamp) {
+        Student student = new Student(id, name, age, address);
+        student.setSuccessTimeStamp(timeStamp);
+        return student;
     }
 }

@@ -40,10 +40,9 @@ import java.util.List;
 public class OperatorTransformation {
 
     /**
-     * 文件路径要写具体的
+     * 文件路径
      */
-    public static final String FILE_PATH = "/Users/jingqi/Deploy/Project/IdeaProject/flink-quick-start/src/main/resources/datasource/student.txt";
-
+    public static final String FILE_PATH = OperatorTransformation.class.getClassLoader().getResource("datasource/student.txt").getPath();
 
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();

@@ -2,10 +2,6 @@ package cn.sevenyuan.datasource;
 
 import cn.sevenyuan.domain.Student;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.io.FileInputFormat;
-import org.apache.flink.api.common.io.FilePathFilter;
-import org.apache.flink.api.java.io.IteratorInputFormat;
 import org.apache.flink.api.java.io.TextInputFormat;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -17,6 +13,8 @@ import org.apache.flink.streaming.api.functions.source.FileProcessingMode;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.util.Collector;
 
+import java.net.URL;
+
 /**
  * 文件输入流
  * @author JingQ at 2019-09-22
@@ -25,8 +23,9 @@ public class DataSourceFromFile {
 
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
-        String filePath = "/Users/jingqi/Deploy/Project/IdeaProject/flink-quick-start/src/main/resources/datasource/student.txt";
+        // 读取文件地址
+        URL fileUrl = DataSourceFromFile.class.getClassLoader().getResource("datasource/student.txt");
+        String filePath = fileUrl.getPath();
 
         // 简单的文字文件输入流
 //        DataStreamSource<String> textFileSource =

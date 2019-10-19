@@ -4,6 +4,7 @@ import cn.sevenyuan.domain.Student;
 import cn.sevenyuan.wordcount.SocketWindowWordCount;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.functions.CoGroupFunction;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.FoldFunction;
@@ -44,6 +45,9 @@ public class OperatorTransformation {
      */
     public static final String FILE_PATH = OperatorTransformation.class.getClassLoader().getResource("datasource/student.txt").getPath();
 
+    public static final String MIN_BY_FILE_PATH = OperatorTransformation.class.getClassLoader().getResource("datasource/student_min&minBy.txt").getPath();
+
+
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> fileSource = env.readTextFile(FILE_PATH);
@@ -81,11 +85,14 @@ public class OperatorTransformation {
         // Transformation split
 //        splitAndSelect(env, fileSource);
 
-        // Transformation connectAndCogroup
-//        connectAndCogroup(env, fileSource);
+        // Transformation cogroup
+        cogroup(env, fileSource);
+
+        // Transformation connectAndCogroupMap
+//        connectAndCogroupMap(env, fileSource);
 
         // Transformation project
-        project(env);
+//        project(env);
     }
 
     private static void map(StreamExecutionEnvironment env, DataStreamSource<String> source) throws Exception {
@@ -147,14 +154,16 @@ public class OperatorTransformation {
     }
 
     private static void keyByAndAggregations(StreamExecutionEnvironment env, DataStreamSource<String> source) throws Exception {
+        source = env.readTextFile(MIN_BY_FILE_PATH);
         SingleOutputStreamOperator operator = source
                 .map((MapFunction<String, Student>) value -> {
                     Student student = parseTokens2Object(parseString2Tokens(value));
                     System.out.println("当前处理时间是：" + System.currentTimeMillis() + "  对象信息 : " + student.getName());
                     return  student; }
                 )
-                .keyBy(5)
-                .minBy("age");
+                .keyBy("id")
+                .minBy("age")
+                ;
         operator.print();
         env.execute("test Transformation : keyByAndReduce");
     }
@@ -221,7 +230,42 @@ public class OperatorTransformation {
         env.execute("test Transformation : union");
     }
 
-    private static void connectAndCogroup(StreamExecutionEnvironment env, DataStreamSource<String> source) throws Exception {
+    private static void cogroup(StreamExecutionEnvironment env, DataStreamSource<String> source) throws  Exception {
+        DataStreamSource<Student> studentDataStreamSource = env.fromCollection(Lists.newArrayList(
+                new Student(1, "otherName1", 1, "a"),
+                new Student(2, "otherName2", 2, "b"),
+                new Student(3, "otherName3", 3, "c")
+        ));
+        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+
+        // 分配时间提取器
+
+        SingleOutputStreamOperator<Student> stream1 = source
+                .map((MapFunction<String, Student>) value -> parseTokens2Object(parseString2Tokens(value)))
+                .assignTimestampsAndWatermarks(new MyExtendTimestampExtractor<>());
+
+        SingleOutputStreamOperator<Student> stream2 = studentDataStreamSource
+                .assignTimestampsAndWatermarks(new MyExtendTimestampExtractor<>());
+
+
+        stream1.coGroup(stream2)
+                .where(
+                        (KeySelector<Student, String>) value -> value.getAddress())
+                .equalTo(
+                        (KeySelector<Student, String>) value -> value.getAddress())
+                .window(TumblingEventTimeWindows.of(Time.milliseconds(1000)))
+                .apply(new CoGroupFunction<Student, Student, Object>() {
+                    @Override
+                    public void coGroup(Iterable<Student> first, Iterable<Student> second, Collector<Object> out) throws Exception {
+                        out.collect(first);
+                        out.collect(second);
+                    }
+                })
+        .print();
+        env.execute("test cogroup");
+    }
+
+    private static void connectAndCogroupMap(StreamExecutionEnvironment env, DataStreamSource<String> source) throws Exception {
         DataStreamSource<Student> studentDataStreamSource = env.fromCollection(Lists.newArrayList(
                 new Student(1, "otherName1", 1, ""),
                 new Student(2, "otherName2", 2, ""),
@@ -319,6 +363,7 @@ public class OperatorTransformation {
         stu.setId(Integer.valueOf(tokens[0]));
         stu.setName(tokens[1]);
         stu.setAge(Integer.valueOf(tokens[2]));
+        stu.setAddress(tokens[3]);
         return stu;
     }
 

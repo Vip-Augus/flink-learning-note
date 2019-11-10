@@ -9,7 +9,7 @@
 
 > Flink 流式计算框架学习笔记
 
-**一直对于流式计算引擎感兴趣，于是一边学习，一边总结知识点，加深理解**
+**一直对流式计算引擎感兴趣，于是一边学习，一边总结知识点，加深理解**
 
 **同时由于个人技术有限，出现理解错误或者有疑问的地方，可在掘金文章下留言，期待朋友们的反馈~**
 
@@ -21,10 +21,6 @@
 ```sh
 git clone https://github.com/Vip-Augus/flink-learning-note
 ```
-
-## 知识点
-
-![](note/pics/Flink_study_diagram.png)
 
 ## 代码执行
 
@@ -56,6 +52,10 @@ git clone https://github.com/Vip-Augus/flink-learning-note
 - [`zhisheng`](http://www.54tianzhisheng.cn/tags/Flink/)
 - [`wuchong`](http://wuchong.me/categories/Flink/)
 
+
+## 知识点
+
+![](note/pics/Flink_study_diagram.png)
 
 ## 点个小星星✨
 

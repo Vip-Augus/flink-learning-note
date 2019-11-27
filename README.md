@@ -34,6 +34,10 @@ git clone https://github.com/Vip-Augus/flink-learning-note
 
 - [Flink 基础学习(三)数据源 DataSource](note/2019-10-24-flink_learn_datasource.md)
 
+- [Flink 基础学习(四)数据转换 Transformation](note/2019-11-12-flink_learn_transformation.md)
+
+- [Flink 基础学习(五)数据存储 DataSink](note/2019-11-21-flink_learn_datasink.md)
+
 
 
 ## 关于我
